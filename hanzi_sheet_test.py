@@ -93,7 +93,7 @@ def grid_lines(string):
             hanzi=string_list.pop(0)
             hanzi_strokes=hanzi_stroke_list(hanzi)
             svg_head='''<svg width="40px" height="40px"><path d="M0 20 L40 20" stroke-dasharray="4,4" stroke-width="1" stroke="#666" fill-opacity="0"/>
-<path d="M20 0 L20 40" stroke-dasharray="4,4" stroke-width="1" stroke="#666" fill-opacity="0"/><path d="M1 1 l38 0 l0 38 l-38 0 z" stroke-width="2" stroke="#111" fill-opacity="0"/><g transform="translate(5,30) scale(0.029, -0.0286)">'''
+<path d="M20 0 L20 40" stroke-dasharray="4,4" stroke-width="0.7" stroke="#666" fill-opacity="0"/><path d="M1 1 l38 0 l0 38 l-38 0 z" stroke-width="1" stroke="#111" fill-opacity="0"/><g transform="translate(5,30) scale(0.029, -0.0286)">'''
             svg_stroke_path_head='''<path d="'''
             svg_stroke_path_end='''"/>'''
             svg_tail='''</g></svg>'''
@@ -109,7 +109,7 @@ def grid_lines(string):
                 f.close()
                 c.setFillColor('#DCDCDC')
                 c.setStrokeColor('#DCDCDC')            
-                renderPDF.draw(drawing,c,margin+2*j*(grid_size+0.5),h-margin-2*i*(grid_size+0.5))
+                renderPDF.draw(drawing,c,margin+2*j*(grid_size+0),h-margin-2*i*(grid_size+0))
         c.showPage()
 
     c.save()

@@ -30,6 +30,7 @@ def hanzi_stroke_list(hanzi):
 
 
 def grid_lines(string):
+    string_len=len(string)
     packet = io.BytesIO()
     c = canvas.Canvas(packet,pagesize=A4)#, pagesize=landscape(A3))
     string_list=list(string)
@@ -52,7 +53,7 @@ def grid_lines(string):
                 c.setLineWidth(0.2)
                 c.setStrokeColor('#C0C0C0')
                 c.setDash(6,3)             
-            c.line(x, margin, x, h)
+            #c.line(x, margin, x, h)
             x += grid_size
             i+=1
         # draw horizontal lines
@@ -66,7 +67,7 @@ def grid_lines(string):
                 c.setLineWidth(0.2)
                 c.setStrokeColor('#C0C0C0')
                 c.setDash(6,3)
-            c.line(margin, y, w, y)
+            #c.line(margin, y, w, y)
             y += grid_size
             i+=1
 
@@ -74,14 +75,6 @@ def grid_lines(string):
         #hanzi_strokes=''
 
         while y>margin and len(string_list)>0:
-            hanzi=string_list.pop(0)
-            hanzi_strokes=hanzi_stroke_list(hanzi)
-            svg_head='''<svg width="40px" height="40px" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M0 20 L40 20" stroke-dasharray="4,4" stroke-width="1" stroke="#666" fill-opacity="0"/>
-<path d="M20 0 L20 40" stroke-dasharray="4,4" stroke-width="1" stroke="#666" fill-opacity="0"/><path d="M1 1 l58 0 l0 58 l-58 0 Z" stroke-width="2" stroke="#111" fill-opacity="0"/>
-<g transform="translate(-2,50) scale(0.058, -0.0572)">'''
-            svg_stroke_path_head='''<path d="'''
-            svg_stroke_path_end='''"/>'''
-            svg_tail='''</g></svg>'''
             c.setFont('kai',32)
             c.setFillColor(black)           
             #c.drawCentredString(x, y,hanzi) #regular hanzi
@@ -89,26 +82,34 @@ def grid_lines(string):
             c.setFillColor('#DCDCDC')
             c.setFont('hei',7)
             c.setFillColor(blue)
-            y -= 2*grid_size    
-        c.setFont('Helvetica',8)
+            y -= 2*grid_size
+        
+        #c.setFont('Helvetica',8)
         #c.drawCentredString(w/2,margin/2,'Page '+str(page_i+1))
         #c.drawRightString(w,margin/2,str(datetime.now().date()))
-        c.setFont('hei',8)
+        #c.setFont('hei',8)
         #c.drawRightString(w,h+grid_size,'Python Hanzi Sheet Generator 汉字田字格生成器')
-        stroke=''
-        for i in range(len(hanzi_strokes)):
-            if i==0:
-                stroke=svg_stroke_path_head+hanzi_strokes[i]+svg_stroke_path_end
-            else:
-                stroke+=svg_stroke_path_head+hanzi_strokes[i]+svg_stroke_path_end
-            full_stroke=''.join((svg_head,svg_stroke_path_head,svg_stroke_path_end,stroke,svg_tail))
-            print (full_stroke)
-            f=io.StringIO(full_stroke)
-            drawing=svg2rlg(f)
-            f.close()
-            c.setFillColor('#DCDCDC')
-            c.setStrokeColor('#DCDCDC')            
-            renderPDF.draw(drawing,c,margin+60*i,h-margin)
+        for i in range(string_len):
+            hanzi=string_list.pop(0)
+            hanzi_strokes=hanzi_stroke_list(hanzi)
+            svg_head='''<svg width="40px" height="40px"><path d="M0 20 L40 20" stroke-dasharray="4,4" stroke-width="1" stroke="#666" fill-opacity="0"/>
+<path d="M20 0 L20 40" stroke-dasharray="4,4" stroke-width="1" stroke="#666" fill-opacity="0"/><path d="M1 1 l38 0 l0 38 l-38 0 z" stroke-width="2" stroke="#111" fill-opacity="0"/><g transform="translate(5,30) scale(0.029, -0.0286)">'''
+            svg_stroke_path_head='''<path d="'''
+            svg_stroke_path_end='''"/>'''
+            svg_tail='''</g></svg>'''
+            for j in range(len(hanzi_strokes)):
+                if j==0:
+                    stroke=svg_stroke_path_head+hanzi_strokes[j]+svg_stroke_path_end
+                else:
+                    stroke+=svg_stroke_path_head+hanzi_strokes[j]+svg_stroke_path_end
+                full_stroke=''.join((svg_head,svg_stroke_path_head,svg_stroke_path_end,stroke,svg_tail))
+                #print (full_stroke)
+                f=io.StringIO(full_stroke)
+                drawing=svg2rlg(f)
+                f.close()
+                c.setFillColor('#DCDCDC')
+                c.setStrokeColor('#DCDCDC')            
+                renderPDF.draw(drawing,c,margin+2*j*(grid_size+0.5),h-margin-2*i*(grid_size+0.5))
         c.showPage()
 
     c.save()
@@ -128,5 +129,5 @@ def grid_lines(string):
 
     os.startfile(new_pdf_file_name,'open')
 
-grid_lines('万')
-#grid_lines('一丁七万丈三上下不与丐丑专且世')
+#grid_lines('万')
+grid_lines('一丁七万丈三上下不与丐丑专且世')

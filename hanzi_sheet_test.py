@@ -9,13 +9,6 @@ from reportlab.lib.units import mm
 from reportlab.lib.colors import Color,black,blue,red,white, green
 from reportlab.lib.pagesizes import A4
 from datetime import date, time, datetime,timedelta
-import reportlab.pdfbase.ttfonts #Import the registered font module of reportlab
-hei=reportlab.pdfbase.ttfonts.TTFont('hei','simhei.ttf') #Import font
-kai=reportlab.pdfbase.ttfonts.TTFont('kai','simkai.ttf') #Import font
-song=reportlab.pdfbase.ttfonts.TTFont('song','simsun.ttc') #Import font
-reportlab.pdfbase.pdfmetrics.registerFont(kai) #Register the font in the current directory
-reportlab.pdfbase.pdfmetrics.registerFont(song) #Register the font in the current directory
-reportlab.pdfbase.pdfmetrics.registerFont(hei) #Register the font in the current directory
 from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPDF
 

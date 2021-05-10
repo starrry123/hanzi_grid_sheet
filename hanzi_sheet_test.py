@@ -40,7 +40,7 @@ def grid_lines(string):
             else:
                 hanzi=''
             svg_head='''<svg width="40px" height="40px"><path d="M0 20 L40 20" stroke-dasharray="4,4" stroke-width="1" stroke="#666" fill-opacity="0"/>
-    <path d="M20 0 L20 40" stroke-dasharray="4,4" stroke-width="0.7" stroke="#666" fill-opacity="0"/><path d="M0 0 l40 0 l0 40 l-40 0 z" stroke-width="1" stroke="#111" fill-opacity="0"/><g transform="translate(0, -900) scale(0.038, -0.038)">'''
+    <path d="M20 0 L20 40" stroke-dasharray="4,4" stroke-width="0.7" stroke="#666" fill-opacity="0"/><path d="M0 0 l40 0 l0 40 l-40 0 z" stroke-width="1" stroke="#111" fill-opacity="0"/><g transform="scale(0.038, -0.038) translate(0, -900) ">'''
             svg_stroke_path_head='''<path stroke-dasharray="4,4" stroke="red" fill='grey' fill-opacity="0.5" d="'''
             svg_stroke_path_end='''"/>'''
             svg_tail='''</g></svg>'''

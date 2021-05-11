@@ -1,5 +1,4 @@
 import io,os, re, json
-from functools import reduce
 from pypinyin import pinyin
 from tkinter import *
 from tkinter import ttk
@@ -10,7 +9,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.colors import Color,black,blue,red,white, green
 from reportlab.lib.pagesizes import A4
 from datetime import date, time, datetime,timedelta
-from reportlab.graphics import renderPDF, renderPM
+from reportlab.graphics import renderPDF
 from svglib.svglib import svg2rlg
 import reportlab.pdfbase.ttfonts
 hei=reportlab.pdfbase.ttfonts.TTFont('hei','simhei.ttf') #Import font

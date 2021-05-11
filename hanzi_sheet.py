@@ -17,17 +17,13 @@ hei=reportlab.pdfbase.ttfonts.TTFont('hei','simhei.ttf') #Import font
 kai=reportlab.pdfbase.ttfonts.TTFont('kai','simkai.ttf') #Import font
 reportlab.pdfbase.pdfmetrics.registerFont(kai) #Register the font in the current directory
 reportlab.pdfbase.pdfmetrics.registerFont(hei) #Register the font in the current directory
-GRID_ROW_NUM, GRID_COLUMN_NUM = 20,13 #Define how many grids do you want each page
+GRID_ROW_NUM, GRID_COLUMN_NUM = 20,13
 IMG_DATA = b'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'
 
-        
-def hanzi_full_stroke_svg(hanzi_strokes):
-    SVG_STROKE_PATH_HEAD='''<path stroke-dasharray="50,30" stroke="black" fill='red' fill-opacity="0.2" d="'''
-    SVG_STROKE_PATH_END='''"/>'''
-    stroke=''
-    for i_stroke in hanzi_strokes:
-        stroke+=SVG_STROKE_PATH_HEAD+ i_stroke +SVG_STROKE_PATH_END
-    return stroke    
+def get_hanzi_strokes(hanzi):
+    hanzi_json=os.path.join(os.path.dirname(os.path.abspath(__file__)),'bishun_data',hanzi+'.json')
+    if os.path.isfile(hanzi_json):
+        return json.load(open(hanzi_json,'r'))['strokes']
 
 def gridbox_svg():
     SVG_HEAD='''<svg width="40px" height="40px"><path d="M0 20 L40 20" stroke-dasharray="4,4" stroke-width="1" stroke="#666" fill-opacity="0"/>
@@ -35,40 +31,33 @@ def gridbox_svg():
     SVG_TAIL='''</g></svg>'''
     return ''.join((SVG_HEAD,SVG_TAIL))
     
-def hanzi_svg(hanzi,j):
-    hanzi_json=os.path.join(os.path.dirname(os.path.abspath(__file__)),'bishun_data',hanzi+'.json')
-    if os.path.isfile(hanzi_json):
-        hanzi_strokes=json.load(open(hanzi_json,'r'))['strokes']
+def hanzi_svg(hanzi_strokes,j):
     SVG_HEAD='''<svg width="40px" height="40px"><path d="M0 20 L40 20" stroke-dasharray="4,4" stroke-width="1" stroke="#666" fill-opacity="0"/>
 <path d="M20 0 L20 40" stroke-dasharray="4,4" stroke-width="0.7" stroke="#666" fill-opacity="0"/><path d="M0.5 0 l40 0 l0 40 l-40 0 z" stroke-width="1" stroke="red" fill-opacity="0"/><g transform="scale(0.038, -0.038) translate(50, -900) ">'''
-    SVG_STROKE_PATH_HEAD='''<path stroke-dasharray="4,4" stroke="black" fill='black' fill-opacity="0.2" d="'''
+    SVG_STROKE_PATH_HEAD='''<path stroke-dasharray="4,4" stroke="black" fill='red' fill-opacity="0.2" d="'''
     SVG_STROKE_PATH_END='''"/>'''
     SVG_TAIL='''</g></svg>'''
     SVG_GRIDBOX=''.join((SVG_HEAD,SVG_TAIL))
     SVG_stroke,hanzi_py='',''
-    if not hanzi:
-        return gridbox_svg(),''
+    if not hanzi_strokes:
+        return gridbox_svg()
     if j==0:
         stroke=''
         for i_stroke in hanzi_strokes:
             stroke+=SVG_STROKE_PATH_HEAD+ i_stroke +SVG_STROKE_PATH_END        
-        hanzi_py=re.sub(r"\[\[\'(.+)\'\]\]", r'\1',str(pinyin(hanzi)))
     elif j==1:
         stroke=SVG_STROKE_PATH_HEAD + hanzi_strokes[0] + SVG_STROKE_PATH_END
-        hanzi_py=''
     elif 1<j<=len(hanzi_strokes):
         stroke=SVG_STROKE_PATH_HEAD + hanzi_strokes[0] + SVG_STROKE_PATH_END
-        hanzi_py=''
         for i in range(j):
             stroke+=SVG_STROKE_PATH_HEAD + hanzi_strokes[i-1] + SVG_STROKE_PATH_END
     else:
         stroke=''
-        hanzi_py=''
 
     SVG_stroke=''.join((SVG_HEAD,stroke,SVG_TAIL))
     if j==0:
         SVG_stroke=SVG_stroke.replace('scale(0.038, -0.038) translate(50, -900)','scale(0.028, -0.028) translate(200, -1200)')
-    return SVG_stroke,hanzi_py
+    return SVG_stroke
 
 def grid_lines(hanzis):
     filter_non_hanzi=re.compile(u'[^\u4E00-\u9FA5]')
@@ -87,9 +76,11 @@ def grid_lines(hanzis):
             if hanzi_list:
                 hanzi=hanzi_list.pop(0)
             else:
-                hanzi=''
+                hanzi, hanzi_strokes='',''
+            hanzi_py=re.sub(r"\[\[\'(.+)\'\]\]", r'\1',str(pinyin(hanzi)))
+            hanzi_strokes=get_hanzi_strokes(hanzi)
             for j in range(GRID_COLUMN_NUM):
-                SVG_stroke,hanzi_py= hanzi_svg(hanzi,j)
+                SVG_stroke= hanzi_svg(hanzi_strokes,j)
                 f_svg=io.StringIO(SVG_stroke)
                 drawing=svg2rlg(f_svg)
                 f_svg.close()
@@ -114,9 +105,6 @@ def grid_lines(hanzis):
 
 
     os.startfile(new_pdf_file_name,'open')
-
-
-
 
 def chinese_grid_lines():
     default_hanzi='天地玄黄宇宙洪荒日月盈昃辰宿列张寒来暑往秋收冬藏闰馀成岁律吕调阳云腾致雨露结为霜金生丽水玉出昆冈剑号巨阙珠称夜光果珍李柰菜重芥姜海咸河淡鳞潜羽翔龙师火帝鸟官人皇始制文字'

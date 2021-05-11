@@ -5,7 +5,6 @@ from tkinter import ttk
 from PyPDF2 import PdfFileWriter, PdfFileReader
 from tkinter import messagebox #for messagebox.
 from reportlab.pdfgen import canvas
-#from reportlab.lib.units import mm
 from reportlab.lib.colors import Color,black,blue,red,white, green
 from reportlab.lib.pagesizes import A4
 from datetime import date, time, datetime,timedelta
@@ -44,16 +43,22 @@ def hanzi_full_stroke_svg(hanzi_strokes):
     return stroke    
 
 def grid_lines(string):
-    string_len=len(string)
+    filter_non_hanzi=re.compile(u'[^\u4E00-\u9FA5]')
+    hanzis=filter_non_hanzi.sub(r'',string) # filter out non-chinese characters   
     packet = io.BytesIO()
     c = canvas.Canvas(packet,pagesize=A4)#, pagesize=landscape(A3))
-    hanzi_list=list(string)
+    hanzi_list=list(hanzis)
     margin=30
     grid_size=40
     page_total=len(hanzi_list)//20+1
-    print (page_total)
+    print ('Total Page: ', page_total)
     w,h=(A4[0]-margin,A4[1]-margin)
+    pb['maximum'] = 1    
     for _ in range(page_total):
+        pb.start()
+        pb['value']=(_+1)/page_total
+        pb.update()
+
         for i in range(20):
             if hanzi_list and hanzi_stroke_list(hanzi_list[0]):
                 hanzi=hanzi_list.pop(0)
@@ -109,6 +114,7 @@ def chinese_grid_lines():
         string=string.replace('\n','')
         grid_lines(string.strip())
     else:
+        t_box.insert(END,default_hanzi)
         messagebox.showinfo("Notification", 'Please enter Hanzi... default PDF file saved!')
         grid_lines(default_hanzi)
 
@@ -129,7 +135,7 @@ t_box.grid(row=0,column=0)
 
 
 frame3= LabelFrame(frame0)
-frame3.grid(row=3,column=0,padx=5, pady=5, ipadx=5, ipady=5, sticky=E+N+S+W)
+frame3.grid(row=2,column=0,padx=5, pady=5, ipadx=5, ipady=5, sticky=E+N+S+W)
 l_icon=Label(frame3,image=img)
 l_icon.grid(row=0,column=0,sticky=E+W+N+S)
 
@@ -137,4 +143,8 @@ b_ok=Button(frame3,command=chinese_grid_lines,text='OK',width=15,fg='green', fon
 b_ok.grid(row=0,column=1,sticky=E)
 b_clear=Button(frame3,command=lambda: t_box.delete('1.0','end-1c'), text='Clear',width=15,font='Tahoma 10 bold')
 b_clear.grid(row=0,column=2, sticky=E)
+
+pb=ttk.Progressbar(frame0, mode = 'determinate')
+pb.grid(row=3,column=0,sticky=N+S+E+W)
+
 mainloop()

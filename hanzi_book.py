@@ -46,12 +46,11 @@ def grid_lines(string):
     page_total=len(hanzis)//GRID_ROW_NUM+1
     print ('Total Page: ', page_total)
     w,h=(A4[0]-margin,A4[1]-margin)
-    c.setFont('hei',7)
-    c.setFillColor(blue) 
+
     for _ in range(page_total):
-        #pb.start()
-        #pb['value']=(_+1)/page_total
-        #pb.update()
+        pb.start()
+        pb['value']=(_+1)/page_total
+        pb.update()
 
         for i in range(GRID_ROW_NUM):
 
@@ -70,6 +69,8 @@ def grid_lines(string):
 
                 if hanzi_strokes:
                     f_svg=io.StringIO(hanzi_SVG)
+                    c.setFont('hei',7)
+                    c.setFillColor(blue)                     
                     c.drawCentredString(margin+0.5*grid_size+j*(grid_size), h-margin-i*grid_size+0.85*grid_size,hanzi_py)               
                 else:
                     f_svg=io.StringIO(GRIDBOX_SVG)

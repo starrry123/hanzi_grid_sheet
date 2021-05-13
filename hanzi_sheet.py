@@ -2,7 +2,7 @@ import io,os, re, json
 from pypinyin import pinyin
 from tkinter import *
 from tkinter import ttk
-from PyPDF2 import PdfFileWriter, PdfFileReader
+#from PyPDF2 import PdfFileWriter, PdfFileReader
 from tkinter import messagebox #for messagebox.
 from reportlab.pdfgen import canvas
 from reportlab.lib.colors import Color,black,blue,red,white, green
@@ -35,7 +35,7 @@ def hanzi_stroke_list(hanzi):
         hanzi_strokes=json.load(open(hanzi_json,'r'))['strokes']
         return hanzi_strokes
     else:
-        return -1
+        return ''
         
 def hanzi_full_stroke_svg(hanzi_strokes):
     stroke=''
@@ -70,12 +70,7 @@ def grid_lines(string):
                 hanzi=''
             hanzi_py=re.sub(r"[\[]+'(.+)\'[\]]+", r'\1',str(pinyin(hanzi)))
             hanzi_strokes=hanzi_stroke_list(hanzi) 
-                        
 
-            if hanzi_strokes==-1:
-                hanzi_strokes=''
-                #continue
-            #manually draw this character if no data available
             if hanzi_strokes:
                 hanzi_strokes_len=len(hanzi_strokes)
 
@@ -115,12 +110,6 @@ def grid_lines(string):
         c.showPage()
 
     c.save()
-
-    packet.seek(0)#buffer start from 0
-    new_pdf = PdfFileReader(packet)
-    output = PdfFileWriter()
-    page=None
-    new_pdf_file_name=None
     new_pdf_file_name=os.path.join(os.path.dirname(__file__), 'Hanzi.'+str(datetime.timestamp(datetime.now()))+'.pdf')
     pdf=open(new_pdf_file_name,'wb')
     pdf.write(packet.getvalue())     # Finally output new pdf

@@ -23,8 +23,8 @@ GRIDBOX_SVG='''<svg width="40px" height="40px"><path d="M0 20 L40 20" stroke-das
 <path d="M0.5 0 l40 0 l0 40 l-40 0 z" stroke-width="0.8" stroke="red" fill-opacity="0"/>
 <g transform="scale(0.038, -0.038) translate(50, -900) "></g></svg>'''
 SVG_HEAD='''<svg width="40px" height="40px"><path d="M0 20 L40 20" stroke-dasharray="6,3" stroke-width="0.4" stroke="grey" fill-opacity="0"/>
-<path d="M20 0 L20 40" stroke-dasharray="6,3" stroke-width="0.4" stroke="grey" fill-opacity="0"/><path d="M0 0 l40 0 l0 40 l-40 0 z" stroke-width="1" stroke="red" fill-opacity="0"/><g transform="scale(0.028, -0.028) translate(200, -1100)">'''
-SVG_STROKE_PATH_HEAD='''<path stroke-dasharray="1,0" stroke="black" fill='black' fill-opacity="1" d="'''
+<path d="M20 0 L20 40" stroke-dasharray="6,3" stroke-width="0.4" stroke="grey" fill-opacity="0"/><path d="M0 0 l40 0 l0 40 l-40 0 z" stroke-width="1" stroke="red" fill-opacity="0"/><g transform="scale(0.038, -0.038) translate(50, -900) ">'''
+SVG_STROKE_PATH_HEAD='''<path stroke-dasharray="1,0" stroke="black" fill='black' fill-opacity="0.2" d="'''
 SVG_STROKE_PATH_END='''"/>'''
 SVG_TAIL='''</g></svg>'''
 
@@ -43,7 +43,7 @@ def grid_lines(string):
     c = canvas.Canvas(packet,pagesize=A4)#, pagesize=landscape(A3))
     hanzi_iter=iter(hanzis)
     margin, grid_size=30,40
-    page_total=len(hanzis)//(GRID_ROW_NUM*GRID_COLUMN_NUM)+1
+    page_total=len(hanzis)//GRID_ROW_NUM+1
     print ('Total Page: ', page_total)
     w,h=(A4[0]-margin,A4[1]-margin)
 
@@ -53,37 +53,47 @@ def grid_lines(string):
         pb.update()
 
         for i in range(GRID_ROW_NUM):
+            try:
+                hanzi=next(hanzi_iter)
+            except StopIteration:
+                hanzi=''
+            hanzi_py=re.sub(r"\[\[\'(.+)\'\]\]", r'\1',str(pinyin(hanzi)))
+            hanzi_strokes=hanzi_stroke_list(hanzi) 
+            if hanzi_strokes:
+                hanzi_strokes_len=len(hanzi_strokes)
 
             for j in range(GRID_COLUMN_NUM):
-                try:
-                    hanzi=next(hanzi_iter)
-                except StopIteration:
-                    hanzi=''
-                hanzi_py=re.sub(r"\[\[\'(.+)\'\]\]", r'\1',str(pinyin(hanzi)))
-                hanzi_strokes=hanzi_stroke_list(hanzi) 
-                if hanzi_strokes:
-                    hanzi_strokes_len=len(hanzi_strokes)               
-
-                stroke=hanzi_full_stroke_svg(hanzi_strokes)
+                if j==0 and hanzi_strokes:
+                    stroke=hanzi_full_stroke_svg(hanzi_strokes)
+                elif j==1 and hanzi_strokes:    
+                    stroke=SVG_STROKE_PATH_HEAD+hanzi_strokes[0]+SVG_STROKE_PATH_END
+                elif j<=hanzi_strokes_len and hanzi_strokes:
+                    stroke+=SVG_STROKE_PATH_HEAD+hanzi_strokes[j-1]+SVG_STROKE_PATH_END
                 hanzi_SVG=''.join((SVG_HEAD,stroke,SVG_TAIL))
+                if j==0:
+                    hanzi_SVG=hanzi_SVG.replace('scale(0.038, -0.038) translate(50, -900)','scale(0.028, -0.028) translate(200, -1100)')
+                    hanzi_SVG=hanzi_SVG.replace('fill-opacity="0.2"','fill-opacity="1"') 
 
-                if hanzi_strokes:
+                if j<=hanzi_strokes_len and hanzi_strokes:
                     f_svg=io.StringIO(hanzi_SVG)
-                    c.setFont('hei',7)
-                    c.setFillColor(blue)                     
-                    c.drawCentredString(margin+0.5*grid_size+j*(grid_size), h-margin-i*grid_size+0.85*grid_size,hanzi_py)               
                 else:
                     f_svg=io.StringIO(GRIDBOX_SVG)
-                    c.setFont('kai',28)
+                drawing=svg2rlg(f_svg)
+#                f_svg.close()
+                renderPDF.draw(drawing,c,margin+j*(grid_size+1),h-margin-i*(grid_size+0))
+                if j==0 and not hanzi_strokes:
+                    c.setFont('kai',30)
                     c.setFillColor('red')
                     c.setStrokeColor('red')
                     c.drawCentredString(margin+0.5*grid_size+j*(grid_size),h-0.7*margin-i*(grid_size),hanzi) #regular hanzi
-                if hanzi:
-                    c.setFont('hei',7)
-                    c.setFillColor(blue)                     
-                    c.drawCentredString(margin+0.5*grid_size+j*(grid_size), h-margin-i*grid_size+0.85*grid_size,hanzi_py)               
-                drawing=svg2rlg(f_svg)
-                renderPDF.draw(drawing,c,margin+j*(grid_size+1),h-margin-i*(grid_size+0))
+                elif not hanzi_strokes :
+                    c.setFillColor('#DCDCDC')
+                    c.drawCentredString(margin+0.5*grid_size+j*(grid_size),h-0.7*margin-i*(grid_size),hanzi) #shaded hanzi
+            c.setFont('hei',7)
+            c.setFillColor(blue) 
+            if hanzi:
+                c.drawString(margin+1, h-margin-i*grid_size+0.85*grid_size,hanzi_py)
+            hanzi_py=''
 
         c.showPage()
 
@@ -93,8 +103,6 @@ def grid_lines(string):
     pdf.write(packet.getvalue())     # Finally output new pdf
 
     os.startfile(new_pdf_file_name,'open')
-
-#grid_lines('天地玄黄宇宙洪荒日月盈昃辰宿列张寒来暑往秋收冬藏闰馀成岁律吕调阳云腾致雨露结为霜金生丽水玉出昆冈剑号巨阙珠称夜光果珍李柰菜重芥姜海咸河淡鳞潜羽翔龙师火帝鸟官人皇始制文字')
 
 def chinese_grid_lines():
     default_hanzi='天地玄黄宇宙洪荒日月盈昃辰宿列张寒来暑往秋收冬藏闰馀成岁律吕调阳云腾致雨露结为霜金生丽水玉出昆冈剑号巨阙珠称夜光果珍李柰菜重芥姜海咸河淡鳞潜羽翔龙师火帝鸟官人皇始制文字'
@@ -138,4 +146,3 @@ pb=ttk.Progressbar(frame0, mode = 'determinate')
 pb.grid(row=3,column=0,sticky=N+S+E+W)
 pb['maximum'] = 1
 mainloop()
-

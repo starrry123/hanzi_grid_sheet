@@ -7,3 +7,4 @@ Place data and the python script together.
 Also thanks to the following projects for the stroke database:
 https://github.com/skishore/makemeahanzi
 https://github.com/chanind/hanzi-writer-data
+Chinese character strokes SVG specs is explained in the above links.

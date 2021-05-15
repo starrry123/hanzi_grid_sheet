@@ -1,5 +1,6 @@
-#This version use *graphics.txt* stroke data from https://github.com/skishore/makemeahanzi
-#Please place this script and graphics.txt in the same folder
+#This version use data file hanzi_strokes.json
+#The json file was generated from *graphics.txt* from https://github.com/skishore/makemeahanzi
+#To run this script, please place a copy of hanzi_strokes.json under the same folder
 import io,os, re, json
 from pypinyin import pinyin
 from tkinter import *
@@ -27,15 +28,11 @@ PATH_HEAD='''<path stroke-dasharray="1,0" stroke="black" fill='black' fill-opaci
 PATH_TAIL='''"/>'''
 SVG_TAIL='''</g></svg>'''
 GRIDBOX_SVG=SVG_HEAD+SVG_TAIL
-graphics_file = os.path.join(os.path.dirname(__file__), 'graphics.txt')
+
 graphics_data = {} #define a hanzi strokes dictionary
-with open(graphics_file,encoding="utf8") as f:
-  lines = f.readlines()
-  for line in lines:
-    decoded_line = json.loads(line)
-    char = decoded_line.pop('character')
-    h_strokes = decoded_line.pop('strokes')
-    graphics_data[char] = h_strokes 
+json_data=os.path.join(os.path.dirname(__file__), 'hanzi_strokes.json')
+with open(json_data,'r') as f:
+  graphics_data=json.load(f)
 
 def hanzi_svg(hanzi_strokes):
     stroke=''.join(map(lambda x: PATH_HEAD+x+PATH_TAIL,hanzi_strokes))

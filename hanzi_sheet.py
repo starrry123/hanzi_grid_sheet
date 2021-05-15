@@ -23,32 +23,41 @@ GRIDBOX_SVG='''<svg width="40px" height="40px"><path d="M0 20 L40 20" stroke-das
 <path d="M0.5 0 l40 0 l0 40 l-40 0 z" stroke-width="0.8" stroke="red" fill-opacity="0"/>
 <g transform="scale(0.038, -0.038) translate(50, -900) "></g></svg>'''
 SVG_HEAD='''<svg width="40px" height="40px"><path d="M0 20 L40 20" stroke-dasharray="6,3" stroke-width="0.4" stroke="grey" fill-opacity="0"/>
-<path d="M20 0 L20 40" stroke-dasharray="6,3" stroke-width="0.4" stroke="grey" fill-opacity="0"/><path d="M0 0 l40 0 l0 40 l-40 0 z" stroke-width="1" stroke="red" fill-opacity="0"/><g transform="scale(0.038, -0.038) translate(50, -900) ">'''
+<path d="M20 0 L20 40" stroke-dasharray="6,3" stroke-width="0.4" stroke="grey" fill-opacity="0"/>
+<path d="M0 0 l40 0 l0 40 l-40 0 z" stroke-width="1" stroke="red" fill-opacity="0"/><g transform="scale(0.038, -0.038) translate(50, -900) ">'''
 SVG_STROKE_PATH_HEAD='''<path stroke-dasharray="1,0" stroke="black" fill='black' fill-opacity="0.2" d="'''
-SVG_STROKE_PATH_END='''"/>'''
+SVG_STROKE_PATH_TAIL='''"/>'''
 SVG_TAIL='''</g></svg>'''
 
 def hanzi_stroke_list(hanzi):
     hanzi_json=os.path.join(os.path.dirname(os.path.abspath(__file__)),'bishun_data',hanzi+'.json')
     return json.load(open(hanzi_json,'r'))['strokes'] if os.path.isfile(hanzi_json) else ''
-   
-def hanzi_full_stroke_svg(hanzi_strokes):
-    hanzi_strokes=[SVG_STROKE_PATH_HEAD+ i_stroke +SVG_STROKE_PATH_END for i_stroke in hanzi_strokes]
-    return ''.join(hanzi_strokes)
 
-def grid_lines(string):
-    filter_non_hanzi=re.compile(u'[^\u4E00-\u9FA5]')
-    hanzis=filter_non_hanzi.sub(r'',string) # filter out non-chinese characters   
+
+def hanzi_svg(hanzi_strokes):
+    stroke=''.join(map(lambda x: SVG_STROKE_PATH_HEAD+x+SVG_STROKE_PATH_TAIL,hanzi_strokes))
+    hanzi_SVG=''.join((SVG_HEAD,stroke,SVG_TAIL))
+    hanzi_SVG=hanzi_SVG.replace('scale(0.038, -0.038) translate(50, -900)','scale(0.028, -0.028) translate(200, -1100)')
+    hanzi_SVG=hanzi_SVG.replace('fill-opacity="0.2"','fill-opacity="1"') 
+    yield hanzi_SVG # 1st yield as full hanzi strokes 
+    stroke=''
+    for i in hanzi_strokes:
+        stroke+=SVG_STROKE_PATH_HEAD+i+SVG_STROKE_PATH_TAIL
+        yield ''.join((SVG_HEAD,stroke,SVG_TAIL)) #yield hanzi strokes in sequence
+
+def pdf_gen(string):
     packet = io.BytesIO()
-    c = canvas.Canvas(packet,pagesize=A4)#, pagesize=landscape(A3))
-    hanzi_iter=iter(hanzis)
-    margin, grid_size=30,40
+    c = canvas.Canvas(packet,pagesize=A4)
+    filter_non_hanzi=re.compile(u'[^\u4E00-\u9FA5]')
+    hanzis=filter_non_hanzi.sub(r'',string) # filter out non-Chinese characters   
+    hanzi_iter=iter(hanzis) #define a string iterator
+    margin, grid_size=30,40 #define page margin
+    page_height=A4[1]-margin
     page_total=len(hanzis)//GRID_ROW_NUM+1
     print ('Total Page: ', page_total)
-    w,h=(A4[0]-margin,A4[1]-margin)
 
     for _ in range(page_total):
-        pb.start()
+        pb.start() #progress bar tracker
         pb['value']=(_+1)/page_total
         pb.update()
 
@@ -59,40 +68,28 @@ def grid_lines(string):
                 hanzi=''
             hanzi_py=re.sub(r"\[\[\'(.+)\'\]\]", r'\1',str(pinyin(hanzi)))
             hanzi_strokes=hanzi_stroke_list(hanzi) 
-            if hanzi_strokes:
-                hanzi_strokes_len=len(hanzi_strokes)
-
+            hanzi_svgs=hanzi_svg(hanzi_strokes) #define a hanzi SVG generator
+            
             for j in range(GRID_COLUMN_NUM):
-                if j==0 and hanzi_strokes:
-                    stroke=hanzi_full_stroke_svg(hanzi_strokes)
-                elif j==1 and hanzi_strokes:    
-                    stroke=SVG_STROKE_PATH_HEAD+hanzi_strokes[0]+SVG_STROKE_PATH_END
-                elif j<=hanzi_strokes_len and hanzi_strokes:
-                    stroke+=SVG_STROKE_PATH_HEAD+hanzi_strokes[j-1]+SVG_STROKE_PATH_END
-                hanzi_SVG=''.join((SVG_HEAD,stroke,SVG_TAIL))
-                if j==0:
-                    hanzi_SVG=hanzi_SVG.replace('scale(0.038, -0.038) translate(50, -900)','scale(0.028, -0.028) translate(200, -1100)')
-                    hanzi_SVG=hanzi_SVG.replace('fill-opacity="0.2"','fill-opacity="1"') 
-
-                if j<=hanzi_strokes_len and hanzi_strokes:
-                    f_svg=io.StringIO(hanzi_SVG)
+                if j<=len(hanzi_strokes) and i<len(hanzis):
+                    hanzi_text=next(hanzi_svgs) #generator yield return of hanzi SVG
+                    f_svg=io.StringIO(hanzi_text) 
                 else:
                     f_svg=io.StringIO(GRIDBOX_SVG)
                 drawing=svg2rlg(f_svg)
-#                f_svg.close()
-                renderPDF.draw(drawing,c,margin+j*(grid_size+1),h-margin-i*(grid_size+0))
+                renderPDF.draw(drawing,c,margin+j*(grid_size+1),page_height-margin-i*(grid_size+0))
                 if j==0 and not hanzi_strokes:
                     c.setFont('kai',30)
                     c.setFillColor('red')
                     c.setStrokeColor('red')
-                    c.drawCentredString(margin+0.5*grid_size+j*(grid_size),h-0.7*margin-i*(grid_size),hanzi) #regular hanzi
+                    c.drawCentredString(margin+0.5*grid_size+j*(grid_size),page_height-0.7*margin-i*(grid_size),hanzi) #regular hanzi
                 elif not hanzi_strokes :
                     c.setFillColor('#DCDCDC')
-                    c.drawCentredString(margin+0.5*grid_size+j*(grid_size),h-0.7*margin-i*(grid_size),hanzi) #shaded hanzi
+                    c.drawCentredString(margin+0.5*grid_size+j*(grid_size),page_height-0.7*margin-i*(grid_size),hanzi) #shaded hanzi
             c.setFont('hei',7)
             c.setFillColor(blue) 
             if hanzi:
-                c.drawString(margin+1, h-margin-i*grid_size+0.85*grid_size,hanzi_py)
+                c.drawString(margin+1, page_height-margin-i*grid_size+0.85*grid_size,hanzi_py)
             hanzi_py=''
 
         c.showPage()
@@ -108,13 +105,11 @@ def chinese_grid_lines():
     default_hanzi='天地玄黄宇宙洪荒日月盈昃辰宿列张寒来暑往秋收冬藏闰馀成岁律吕调阳云腾致雨露结为霜金生丽水玉出昆冈剑号巨阙珠称夜光果珍李柰菜重芥姜海咸河淡鳞潜羽翔龙师火帝鸟官人皇始制文字'
     t_box_text=t_box.get('1.0','end-1c')
     if len(t_box_text)>0:
-        string=t_box_text
-        string=string.replace('\n','')
-        grid_lines(string.strip())
+        pdf_gen(t_box_text.strip())
     else:
         t_box.insert(END,default_hanzi)
         messagebox.showinfo("Notification", 'Please enter Hanzi... default PDF file saved!')
-        grid_lines(default_hanzi)
+        pdf_gen(default_hanzi)
 
 app=Tk()
 app.title("Hanzi Writing Sheet Generator")

@@ -29,7 +29,6 @@ def hanzi_stroke_list(hanzi):
     hanzi_json=os.path.join(os.path.dirname(os.path.abspath(__file__)),'bishun_data',hanzi+'.json')
     return json.load(open(hanzi_json,'r'))['strokes'] if os.path.isfile(hanzi_json) else ''
 
-
 def hanzi_svg(hanzi_strokes):
     stroke=''.join(map(lambda x: SVG_STROKE_PATH_HEAD+x+SVG_STROKE_PATH_TAIL,hanzi_strokes))
     hanzi_SVG=''.join((SVG_HEAD,stroke,SVG_TAIL))

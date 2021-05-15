@@ -60,7 +60,7 @@ def pdf_gen(string):
                 hanzi=next(hanzi_iter)
             except StopIteration:
                 hanzi=''
-            hanzi_py=re.sub(r"\[\[\'(.+)\'\]\]", r'\1',str(pinyin(hanzi)))
+            hanzi_pinyin=re.sub(r"\[\[\'(.+)\'\]\]", r'\1',str(pinyin(hanzi)))
             hanzi_strokes=hanzi_stroke_list(hanzi) 
             hanzi_svgs=hanzi_svg(hanzi_strokes) #define a hanzi SVG generator
             
@@ -72,22 +72,21 @@ def pdf_gen(string):
                     f_svg=io.StringIO(GRIDBOX_SVG)
                 drawing=svg2rlg(f_svg)
                 renderPDF.draw(drawing,c,margin+j*(grid_size+1),page_height-margin-i*(grid_size+0))
-                if j==0 and not hanzi_strokes:
+                if j==0 and not hanzi_strokes: # drawString method if stroke data not available 
                     c.setFont('kai',30)
                     c.setFillColor('red')
-                    c.setStrokeColor('red')
+                    c.setStrokeColor('blue')
                     c.drawCentredString(margin+0.5*grid_size+j*(grid_size),page_height-0.7*margin-i*(grid_size),hanzi) #regular hanzi
-                elif not hanzi_strokes :
-                    c.setFillColor('#DCDCDC')
-                    c.drawCentredString(margin+0.5*grid_size+j*(grid_size),page_height-0.7*margin-i*(grid_size),hanzi) #shaded hanzi
-            c.setFont('hei',7)
-            c.setFillColor(blue) 
+                elif not hanzi_strokes : #draw shaded hanzi if stroke data not available
+                    c.setFillColor('grey')
+                    c.setFont('kai',32)
+                    c.drawCentredString(margin+0.5*grid_size+j*(grid_size+1),page_height-0.7*margin-i*(grid_size),hanzi) #shaded hanzi
+
             if hanzi:
-                c.drawString(margin+1, page_height-margin-i*grid_size+0.85*grid_size,hanzi_py)
-            hanzi_py=''
-
+                c.setFont('hei',7)
+                c.setFillColor(blue)                 
+                c.drawString(margin+1, page_height-margin-i*grid_size+0.85*grid_size,hanzi_pinyin)
         c.showPage()
-
     c.save()
     new_pdf_file_name=os.path.join(os.path.dirname(__file__), 'Hanzi.'+str(datetime.timestamp(datetime.now()))+'.pdf')
     pdf=open(new_pdf_file_name,'wb')

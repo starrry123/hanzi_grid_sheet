@@ -1,5 +1,5 @@
 #This version use stroke json data from https://github.com/bunian/tianzigebishun 
-#You have download and extract bishun_data.zip, 
+#You have to download and extract bishun_data.zip from that site, 
 #then place this script and bishun_data under same folder
 import io,os, re, json
 from pypinyin import pinyin

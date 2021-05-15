@@ -31,7 +31,7 @@ GRIDBOX_SVG=SVG_HEAD+SVG_TAIL
 
 graphics_data = {} #define a hanzi strokes dictionary
 json_data=os.path.join(os.path.dirname(__file__), 'hanzi_strokes.json')
-with open(json_data,'r') as f:
+with open(json_data,'r',encoding='utf8') as f:
   graphics_data=json.load(f)
 
 def hanzi_svg(hanzi_strokes):

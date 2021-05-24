@@ -53,7 +53,7 @@ def pdf_gen(string):
     hanzi_iter=iter(hanzis) #define a string iterator
     margin, grid_size=30,40 #define page margin
     page_height=A4[1]-margin
-    page_total=len(hanzis)//GRID_ROW_NUM+1
+    page_total=len(hanzis)//(GRID_ROW_NUM+1)+1
     print ('Total Page: ', page_total)
 
     for _ in range(page_total):

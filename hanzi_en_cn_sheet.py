@@ -35,10 +35,9 @@ json_data=os.path.join(os.path.dirname(__file__), 'hanzi_strokes.json')
 with open(json_data,'r',encoding='utf8') as f:
     graphics_data=json.load(f)
 
-def save_pdf(packet):
-    new_pdf_file_name=os.path.join(os.path.dirname(__file__), 'Hanzi.'+str(datetime.timestamp(datetime.now()))+'.pdf')
-    pdf=open(new_pdf_file_name,'wb')
-    pdf.write(packet.getvalue())     # Finally output new pdf
+def save_pdf(packet,new_pdf_file_name):
+    with open(new_pdf_file_name,'wb') as pdf:
+        pdf.write(packet.getvalue())     # Finally output new pdf
     os.startfile(new_pdf_file_name,'open')
 
 
@@ -108,7 +107,8 @@ def pdf_gen(hanzis):
         row_i+=hz_row+1
         #print(hanzi,hanzi_strokes_len,hz_row,row_i)
     c.save()
-    save_pdf(packet)
+    new_pdf_file_name=os.path.join(os.path.dirname(__file__), 'CN.'+datetime.now().strftime('%Y%m%d%H%M%S')+'.pdf')
+    save_pdf(packet,new_pdf_file_name)
 
 #pdf_gen('藏龘靐齉齾龗龖鱻麤爩籲灪灩鱺鸝鸞麣驫饢籱癵爨厵鸜麷驪鬱韊靏钃讟纞虋齽齼鼺嘢嬈雌御噠蕴颱藏嘢嬈雌御噠蕴颱')   
 
@@ -123,6 +123,8 @@ def pdf_gen_en(words):
     print ('Total Page: ', page_total)
     c.setFont('courgette',28)
     c.setFillColor('black')
+    c.setStrokeColor('black')
+    
     for _ in range(page_total):
         for i in range(GRID_ROW_NUM):
             try:
@@ -145,7 +147,8 @@ def pdf_gen_en(words):
         c.showPage()
 
     c.save()
-    save_pdf(packet_en)
+    new_pdf_file_name=os.path.join(os.path.dirname(__file__), 'EN.'+datetime.now().strftime('%Y%m%d%H%M%S')+'.pdf')
+    save_pdf(packet_en,new_pdf_file_name)
 
 
 
@@ -159,22 +162,22 @@ def str_prep():
         if string_len>0:
             filter_non_hanzi=re.compile(u'[^\u4E00-\u9FA5]')
             hanzis=filter_non_hanzi.sub(r'',t_box_text.strip()) # filter out non-Chinese characters
-            pdf_gen(hanzis)
         else:
+            messagebox.showinfo("Notification", 'Please enter Hanzi... default PDF file saved!')           
             t_box.insert(END,default_hanzi)
-            messagebox.showinfo("Notification", 'Please enter Hanzi... default PDF file saved!')
-            pdf_gen(default_hanzi)
+            hanzis=default_hanzi
+        pdf_gen(hanzis)
     else :
         if string_len>0:
             filter_non_en=re.compile('[^a-zA-Z]')
             string=filter_non_en.sub(r' ',t_box_text.strip())
-            words=re.split(r'[ ,|;"]+',string)
-            pdf_gen_en(words)
         else:
-            t_box.insert(END,default_en)
             messagebox.showinfo("Notification", 'Please enter Words... default PDF file saved!')
-            words=re.split(r'[ ,|;"]+',default_en)
-            pdf_gen_en(words)
+            t_box.insert(END,default_en)
+            string=default_en
+        words=re.split(r'[ ,|;"]+',string)
+        pdf_gen_en(words)
+
 
 app=Tk()
 app.title("Handwriting Sheet Generator...")
